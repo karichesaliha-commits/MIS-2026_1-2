@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIS Concept Assessment Grid</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            padding: 30px;
+            background: #f9f9f9;
+        }
+
+        .mode-btn {
+            flex: 1;
+            max-width: 300px;
+            padding: 40px 30px;
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            border-color: #764ba2;
+        }
+
+        .mode-btn h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .content-area {
+            padding: 30px;
+            display: none;
+        }
+
+        .content-area.active {
+            display: block;
+        }
+
+        .back-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background: #764ba2;
+        }
+
+        /* Session Management */
+        .session-box {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 2px solid #667eea;
+        }
+
+        .session-code {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            letter-spacing: 5px;
+            margin: 20px 0;
+            border: 3px dashed #667eea;
+        }
+
+        .instruction {
+            text-align: center;
+            color: #666;
+            font-size: 1.1em;
+            margin: 15px 0;
+        }
+
+        /* Grid Setup */
+        .setup-section {
+            margin-bottom: 30px;
+        }
+
+        .setup-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .grid-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .grid-controls input, .grid-controls button, .grid-controls select {
+            padding: 12px 20px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .grid-controls input {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .grid-controls button {
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .grid-controls button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .concept-grid {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .concept-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .concept-item input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        /* Student View */
+        .student-info {
+            margin-bottom: 30px;
+        }
+
+        .student-info input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .assessment-grid {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .assessment-cell {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .assessment-cell.selected {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .assessment-cell.red { background: #ffebee; border-color: #f44336; }
+        .assessment-cell.yellow { background: #fffde7; border-color: #ffeb3b; }
+        .assessment-cell.green { background: #e8f5e9; border-color: #4caf50; }
+
+        .concept-name {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .color-options {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .color-btn {
+            width: 60px;
+            height: 60px;
+            border: 3px solid transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .color-btn.selected {
+            border-color: #333;
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.2);
+        }
+
+        .color-btn.red { background: #f44336; }
+        .color-btn.yellow { background: #ffeb3b; }
+        .color-btn.green { background: #4caf50; }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Results */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .results-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .results-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .results-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 20px;
+            animation: slideIn 0.5s;
+        }
+
+        .error-message {
+            background: #f44336;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .export-btn {
+            padding: 12px 24px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+
+        .export-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .mode-selector {
+                flex-direction: column;
+            }
+            
+            .grid-controls {
+                flex-direction: column;
+            }
+            
+            .color-btn {
+                width: 50px;
+                height: 50px;
+            }
+
+            .session-code {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 MIS Concept Assessment Grid</h1>
+            <p>Interactive Knowledge Assessment Tool</p>
+        </div>
+
+        <!-- Mode Selection -->
+        <div id="modeSelector" class="mode-selector">
+            <div class="mode-btn" onclick="startTeacherMode()">
+                <h2>👨‍🏫 Teacher</h2>
+                <p>Create and manage assessment sessions</p>
+            </div>
+            <div class="mode-btn" onclick="startStudentMode()">
+                <h2>👨‍🎓 Student</h2>
+                <p>Join a session and complete assessment</p>
+            </div>
+        </div>
+
+        <!-- Teacher Setup -->
+        <div id="teacherArea" class="content-area">
+            <button class="back-btn" onclick="goBack()">← Back to Main Menu</button>
+            
+            <div class="session-box">
+                <h2 style="color: #667eea; text-align: center; margin-bottom: 20px;">Your Session Code</h2>
+                <div class="session-code" id="teacherSessionCode">----</div>
+                <p class="instruction">Share this code with your students to join the assessment</p>
+            </div>
+
+            <div class="setup-section">
+                <h3>Grid Configuration</h3>
+                <div class="grid-controls">
+                    <input type="number" id="gridRows" value="3" min="1" max="10" placeholder="Rows">
+                    <input type="number" id="gridCols" value="3" min="1" max="10" placeholder="Columns">
+                    <button onclick="createGrid()">Create Grid</button>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <h3>Add MIS Concepts</h3>
+                <div id="conceptsGrid" class="concept-grid"></div>
+                <button class="grid-controls button" onclick="saveSession()" style="width: 100%; padding: 15px; background: #4caf50; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; margin-top: 20px;">💾 Save Session</button>
+            </div>
+
+            <div class="setup-section">
+                <h3>Live Results</h3>
+                <button class="export-btn" onclick="refreshTeacherResults()">🔄 Refresh Results</button>
+                <button class="export-btn" onclick="exportToCSV()">📥 Export to CSV</button>
+                
+                <div class="stats-grid" id="teacherStatsGrid"></div>
+                
+                <h4 style="color: #667eea; margin: 20px 0;">Individual Student Results</h4>
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>🔴 Red</th>
+                            <th>🟡 Yellow</th>
+                            <th>🟢 Green</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teacherResultsBody"></tbody>
+                </table>
+
+                <h4 style="color: #667eea; margin: 20px 0;">Concept Analysis</h4>
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Concept</th>
+                            <th>🔴 Red</th>
+                            <th>🟡 Yellow</th>
+                            <th>🟢 Green</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teacherConceptBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Student Join -->
+        <div id="studentJoinArea" class="content-area">
+            <button class="back-btn" onclick="goBack()">← Back to Main Menu</button>
+            
+            <div class="setup-section">
+                <h3 style="text-align: center; margin-bottom: 30px;">Join Assessment Session</h3>
+                
+                <div class="student-info">
+                    <input type="text" id="sessionCodeInput" placeholder="Enter Session Code (e.g., A1B2)" maxlength="4" style="text-transform: uppercase; text-align: center; font-size: 24px; letter-spacing: 5px;">
+                    <input type="text" id="studentNameInput" placeholder="Enter Your Full Name">
+                    <button class="submit-btn" onclick="joinSession()">Join Session</button>
+                </div>
+                
+                <div id="joinMessage"></div>
+            </div>
+        </div>
+
+        <!-- Student Assessment -->
+        <div id="studentAssessmentArea" class="content-area">
+            <button class="back-btn" onclick="goBack()">← Back to Main Menu</button>
+            
+            <div class="session-box">
+                <h3 style="color: #667eea; text-align: center;">Session: <span id="currentSessionCode"></span></h3>
+                <p style="text-align: center; color: #666; margin-top: 10px;">Student: <strong id="currentStudentName"></strong></p>
+            </div>
+
+            <div class="setup-section">
+                <h3 style="color: #667eea;">Rate Your Understanding</h3>
+                <p style="color: #666; margin-bottom: 20px;">
+                    🔴 Red = Need Help | 🟡 Yellow = Somewhat Understand | 🟢 Green = Fully Understand
+                </p>
+                <div id="studentAssessmentGrid" class="assessment-grid"></div>
+                <button class="submit-btn" onclick="submitAssessment()" id="submitAssessmentBtn">Submit Assessment</button>
+                <div id="assessmentMessage"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSessionId = null;
+        let currentStudentName = null;
+        let concepts = [];
+        let currentSelections = {};
+
+        // Generate random session code
+        function generateSessionCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 4; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        // Mode switching
+        function startTeacherMode() {
+            document.getElementById('modeSelector').style.display = 'none';
+            document.getElementById('teacherArea').classList.add('active');
+            
+            currentSessionId = generateSessionCode();
+            document.getElementById('teacherSessionCode').textContent = currentSessionId;
+            
+            loadSession();
+        }
+
+        function startStudentMode() {
+            document.getElementById('modeSelector').style.display = 'none';
+            document.getElementById('studentJoinArea').classList.add('active');
+        }
+
+        function goBack() {
+            document.querySelectorAll('.content-area').forEach(area => {
+                area.classList.remove('active');
+            });
+            document.getElementById('modeSelector').style.display = 'flex';
+            currentSessionId = null;
+            currentStudentName = null;
+            concepts = [];
+            currentSelections = {};
+        }
+
+        // Grid creation
+        function createGrid() {
+            const rows = parseInt(document.getElementById('gridRows').value);
+            const cols = parseInt(document.getElementById('gridCols').value);
+            const totalCells = rows * cols;
+
+            concepts = Array(totalCells).fill('').map((_, i) => ({
+                id: i,
+                name: concepts[i]?.name || ''
+            }));
+
+            renderConceptsGrid();
+        }
+
+        function renderConceptsGrid() {
+            const grid = document.getElementById('conceptsGrid');
+            const cols = parseInt(document.getElementById('gridCols').value) || 3;
+            
+            grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            grid.innerHTML = concepts.map((concept, i) => `
+                <div class="concept-item">
+                    <input 
+                        type="text" 
+                        placeholder="Concept ${i + 1}" 
+                        value="${concept.name}"
+                        onchange="updateConcept(${i}, this.value)"
+                    />
+                </div>
+            `).join('');
+        }
+
+        function updateConcept(index, value) {
+            concepts[index].name = value;
+        }
+
+        // Session management
+        async function saveSession() {
+            if (!currentSessionId) return;
+
+            const sessionData = {
+                sessionId: currentSessionId,
+                concepts: concepts,
+                rows: parseInt(document.getElementById('gridRows').value),
+                cols: parseInt(document.getElementById('gridCols').value),
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                await window.storage.set(`session-${currentSessionId}`, JSON.stringify(sessionData), true);
+                alert('✅ Session saved successfully! Students can now join using code: ' + currentSessionId);
+            } catch (error) {
+                alert('❌ Error saving session. Please try again.');
+                console.error(error);
+            }
+        }
+
+        async function loadSession() {
+            if (!currentSessionId) return;
+
+            try {
+                const result = await window.storage.get(`session-${currentSessionId}`, true);
+                if (result && result.value) {
+                    const sessionData = JSON.parse(result.value);
+                    concepts = sessionData.concepts;
+                    document.getElementById('gridRows').value = sessionData.rows;
+                    document.getElementById('gridCols').value = sessionData.cols;
+                    renderConceptsGrid();
+                    await refreshTeacherResults();
+                } else {
+                    // New session - initialize with default grid
+                    createGrid();
+                }
+            } catch (error) {
+                createGrid();
+            }
+        }
+
+        // Student join
+        async function joinSession() {
+            const sessionCode = document.getElementById('sessionCodeInput').value.trim().toUpperCase();
+            const studentName = document.getElementById('studentNameInput').value.trim();
+
+            if (!sessionCode || sessionCode.length !== 4) {
+                document.getElementById('joinMessage').innerHTML = '<div class="error-message">Please enter a valid 4-character session code</div>';
+                return;
+            }
+
+            if (!studentName) {
+                document.getElementById('joinMessage').innerHTML = '<div class="error-message">Please enter your name</div>';
+                return;
+            }
+
+            try {
+                const result = await window.storage.get(`session-${sessionCode}`, true);
+                if (!result || !result.value) {
+                    document.getElementById('joinMessage').innerHTML = '<div class="error-message">Session not found. Please check the code and try again.</div>';
+                    return;
+                }
+
+                const sessionData = JSON.parse(result.value);
+                concepts = sessionData.concepts;
+                currentSessionId = sessionCode;
+                currentStudentName = studentName;
+
+                // Switch to assessment view
+                document.getElementById('studentJoinArea').classList.remove('active');
+                document.getElementById('studentAssessmentArea').classList.add('active');
+                document.getElementById('currentSessionCode').textContent = sessionCode;
+                document.getElementById('currentStudentName').textContent = studentName;
+
+                renderStudentAssessmentGrid();
+            } catch (error) {
+                document.getElementById('joinMessage').innerHTML = '<div class="error-message">Error joining session. Please try again.</div>';
+                console.error(error);
+            }
+        }
+
+        // Student assessment
+        function renderStudentAssessmentGrid() {
+            const grid = document.getElementById('studentAssessmentGrid');
+            const cols = parseInt(document.getElementById('gridCols')?.value) || 3;
+            
+            grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            grid.innerHTML = concepts.map((concept, i) => {
+                if (!concept.name) return '';
+                
+                return `
+                    <div class="assessment-cell" id="cell-${i}">
+                        <div class="concept-name">${concept.name}</div>
+                        <div class="color-options">
+                            <button class="color-btn red" onclick="selectColor(${i}, 'red')" id="btn-${i}-red"></button>
+                            <button class="color-btn yellow" onclick="selectColor(${i}, 'yellow')" id="btn-${i}-yellow"></button>
+                            <button class="color-btn green" onclick="selectColor(${i}, 'green')" id="btn-${i}-green"></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectColor(conceptId, color) {
+            currentSelections[conceptId] = color;
+            
+            ['red', 'yellow', 'green'].forEach(c => {
+                const btn = document.getElementById(`btn-${conceptId}-${c}`);
+                if (btn) {
+                    btn.classList.toggle('selected', c === color);
+                }
+            });
+            
+            const cell = document.getElementById(`cell-${conceptId}`);
+            if (cell) {
+                cell.className = `assessment-cell selected ${color}`;
+            }
+        }
+
+        async function submitAssessment() {
+            const filledConcepts = concepts.filter(c => c.name).length;
+            if (Object.keys(currentSelections).length < filledConcepts) {
+                alert('Please rate all concepts before submitting');
+                return;
+            }
+
+            const timestamp = new Date().toISOString();
+            const response = {
+                name: currentStudentName,
+                selections: {...currentSelections},
+                timestamp: timestamp,
+                counts: {
+                    red: Object.values(currentSelections).filter(c => c === 'red').length,
+                    yellow: Object.values(currentSelections).filter(c => c === 'yellow').length,
+                    green: Object.values(currentSelections).filter(c => c === 'green').length
+                }
+            };
+
+            try {
+                const responseKey = `response-${currentSessionId}-${Date.now()}`;
+                await window.storage.set(responseKey, JSON.stringify(response), true);
+
+                document.getElementById('assessmentMessage').innerHTML = `
+                    <div class="success-message">
+                        ✅ Assessment submitted successfully!<br>
+                        Red: ${response.counts.red} | Yellow: ${response.counts.yellow} | Green: ${response.counts.green}
+                    </div>
+                `;
+
+                document.getElementById('submitAssessmentBtn').disabled = true;
+            } catch (error) {
+                alert('Error submitting assessment. Please try again.');
+                console.error(error);
+            }
+        }
+
+        // Teacher results
+        async function refreshTeacherResults() {
+            if (!currentSessionId) return;
+
+            try {
+                const keys = await window.storage.list(`response-${currentSessionId}-`, true);
+                const responses = [];
+
+                if (keys && keys.keys) {
+                    for (const key of keys.keys) {
+                        try {
+                            const result = await window.storage.get(key, true);
+                            if (result && result.value) {
+                                responses.push(JSON.parse(result.value));
+                            }
+                        } catch (e) {
+                            console.error('Error loading response:', e);
+                        }
+                    }
+                }
+
+                displayTeacherResults(responses);
+            } catch (error) {
+                console.error('Error refreshing results:', error);
+            }
+        }
+
+        function displayTeacherResults(responses) {
+            // Overall stats
+            const totalResponses = responses.length;
+            let totalRed = 0, totalYellow = 0, totalGreen = 0;
+
+            responses.forEach(response => {
+                totalRed += response.counts.red;
+                totalYellow += response.counts.yellow;
+                totalGreen += response.counts.green;
+            });
+
+            document.getElementById('teacherStatsGrid').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Total Students</div>
+                    <div class="stat-value">${totalResponses}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Red</div>
+                    <div class="stat-value">${totalRed}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Yellow</div>
+                    <div class="stat-value">${totalYellow}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Green</div>
+                    <div class="stat-value">${totalGreen}</div>
+                </div>
+            `;
+
+            // Individual results
+            const tbody = document.getElementById('teacherResultsBody');
+            tbody.innerHTML = responses.map(response => `
+                <tr>
+                    <td>${response.name}</td>
+                    <td>${response.counts.red}</td>
+                    <td>${response.counts.yellow}</td>
+                    <td>${response.counts.green}</td>
+                    <td>${new Date(response.timestamp).toLocaleTimeString()}</td>
+                </tr>
+            `).join('');
+
+            // Concept analysis
+            const conceptStats = {};
+            concepts.forEach(concept => {
+                if (concept.name) {
+                    conceptStats[concept.id] = { name: concept.name, red: 0, yellow: 0, green: 0 };
+                }
+            });
+
+            responses.forEach(response => {
+                Object.entries(response.selections).forEach(([conceptId, color]) => {
+                    if (conceptStats[conceptId]) {
+                        conceptStats[conceptId][color]++;
+                    }
+                });
+            });
+
+            const conceptBody = document.getElementById('teacherConceptBody');
+            conceptBody.innerHTML = Object.values(conceptStats).map(stats => `
+                <tr>
+                    <td>${stats.name}</td>
+                    <td>${stats.red}</td>
+                    <td>${stats.yellow}</td>
+                    <td>${stats.green}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Export
+        async function exportToCSV() {
+            if (!currentSessionId) return;
+
+            try {
+                const keys = await window.storage.list(`response-${currentSessionId}-`, true);
+                const responses = [];
+
+                if (keys && keys.keys) {
+                    for (const key of keys.keys) {
+                        const result = await window.storage.get(key, true);
+                        if (result && result.value) {
+                            responses.push(JSON.parse(result.value));
+                        }
+                    }
+                }
+
+                let csv = 'Student Name,Red Count,Yellow Count,Green Count,Timestamp\n';
+                
+                responses.forEach(response => {
+                    csv += `"${response.name}",${response.counts.red},${response.counts.yellow},${response.counts.green},"${response.timestamp}"\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `mis-assessment-${currentSessionId}.csv`;
+                a.click();
+            } catch (error) {
+                alert('Error exporting data');
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>
